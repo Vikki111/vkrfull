@@ -1,0 +1,29 @@
+drop table exercise, student;
+
+Create table exercise
+	(
+		id SERIAL PRIMARY KEY,
+		exercise varchar(5000),
+		description varchar(5000),
+		graph varchar(50000)
+	);
+
+
+Create table student
+	(
+		id SERIAL PRIMARY KEY,
+		last_name varchar(40),
+		first_name varchar(40),
+		patronymic varchar(40),
+		mark integer,
+		graph varchar(50000),
+		ready boolean,
+		comment varchar(5000),
+		exercise_id integer,
+		FOREIGN KEY (exercise_id) REFERENCES exercise (id) ON DELETE RESTRICT ON UPDATE CASCADE
+	);
+
+
+INSERT INTO exercise (id, exercise, description, graph) VALUES (1, 'first ex', 'first desc', 'first graph');
+INSERT INTO student (id, last_name, first_name, patronymic, mark, graph, ready, comment, exercise_id)
+VALUES (1, 'last_name', 'first_name', 'patronymic', 5, 'graph', TRUE, 'comment', 1);
