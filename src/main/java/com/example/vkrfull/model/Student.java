@@ -38,6 +38,8 @@ public class Student {
     private String firstName;
     @Column(name = "patronymic")
     private String patronymic;
+    @Column(name = "department")
+    private String department;
     @Column(name = "mark")
     private Integer mark;
     @Column(name = "graph")

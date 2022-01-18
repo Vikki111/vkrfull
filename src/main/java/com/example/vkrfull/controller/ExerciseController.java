@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 @Slf4j
@@ -23,8 +26,25 @@ public class ExerciseController {
         this.exerciseService = exerciseService;
     }
 
+    @RequestMapping("/pytest")
+    public String pytest() {
+        Runtime rt = Runtime.getRuntime();
+        String processString = "python3 HelloWorld.py";
+        System.out.println(processString);
+
+        try {
+            Process extractProcess = rt.exec(processString);
+            BufferedReader input = new BufferedReader(new InputStreamReader(extractProcess.getInputStream()));
+            String pyString = input.readLine();
+            return pyString;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "PYTHON DID NOT RUN";
+        }
+    }
+
     @PostMapping(value = "/exercises")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody Exercise exercise) {
         log.debug("exerciseBody '{}'", exercise);
         exerciseService.create(exercise);
@@ -33,7 +53,7 @@ public class ExerciseController {
     }
 
     @GetMapping(value = "/exercises")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<List<Exercise>> getAll() {
         final List<Exercise> exercises = exerciseService.getAll();
         log.info("get entity");
@@ -41,7 +61,7 @@ public class ExerciseController {
     }
 
     @GetMapping(value = "/exercises/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<Exercise> get(@PathVariable(name = "id") int id) {
         log.debug("id '{}'", id);
         final Exercise exercise = exerciseService.get(id);
@@ -50,7 +70,7 @@ public class ExerciseController {
     }
 
     @PutMapping(value = "/exercises/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(@PathVariable(name = "id") int id,
                                     @RequestBody Exercise exercise) {
         log.debug("exerciseBody '{}'", exercise);
@@ -59,7 +79,7 @@ public class ExerciseController {
     }
 
     @DeleteMapping(value = "/exercises/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
         exerciseService.delete(id);
         log.debug("id '{}'", id);

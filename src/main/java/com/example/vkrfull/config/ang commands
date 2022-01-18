@@ -1,0 +1,3 @@
+ng serve
+ng g component components/position
+ng g s auth
