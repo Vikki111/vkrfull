@@ -12,6 +12,7 @@ import java.util.*;
 @AllArgsConstructor
 public class FSM {
 
+    //вершина(откуда), вершина(куда) -> список символов в лейбле
     Map<Pair<String, String>, List<String>> edges;
     String start_state;
     List<String> final_states;
@@ -48,6 +49,7 @@ public class FSM {
         }
     }
 
+    //выходящие ребра из данной вершины
     public Map<String, List<String>> get_output_edges(String src_state) {
         Map<String, List<String>> output_edges = new HashMap<>();
         for (Pair<String, String> pair: edges.keySet()) {
@@ -66,22 +68,23 @@ public class FSM {
         return output_edges;
     }
 
-    public Map<String, List<String>> get_input_edges(String src_state) {
-        Map<String, List<String>> output_edges = new HashMap<>();
+    //входящие ребра в данную вершину
+    public Map<String, List<String>> get_input_edges(String dst_state) {
+        Map<String, List<String>> input_edges = new HashMap<>();
         for (Pair<String, String> pair: edges.keySet()) {
-            if(pair.getValue().equals(src_state)) {
+            if(pair.getValue().equals(dst_state)) {
                 for (String symbol : edges.get(pair)) {
-                    if(output_edges.containsKey(symbol)) {
-                        output_edges.get(symbol).add(pair.getKey());
+                    if(input_edges.containsKey(symbol)) {
+                        input_edges.get(symbol).add(pair.getKey());
                     } else {
                         ArrayList arrayList = new ArrayList();
                         arrayList.add(pair.getKey());
-                        output_edges.put(symbol, arrayList);
+                        input_edges.put(symbol, arrayList);
                     }
                 }
             }
         }
-        return output_edges;
+        return input_edges;
     }
 
     public List<String> get_children(List<String> src_states) {
@@ -110,7 +113,7 @@ public class FSM {
         for (String dst_state : dst_states) {
             for (Pair<String, String> pair: edges.keySet()) {
                 if (pair.getValue().equals(dst_states)) {
-                    parents.add(pair.getValue()); ////////////?
+                    parents.add(pair.getKey()); ////////////?
                 }
             }
         }
@@ -136,5 +139,56 @@ public class FSM {
         }
     }
 
+    public void copy_output_edges(String from_state, String to_state) {
+        Map<String, List<String>> output_edges = get_output_edges(from_state);
+        Set<String> keyset = output_edges.keySet();
+        for (String symbol: keyset) {
+            for (String dst_state : output_edges.get(symbol)) {
+                add_edge(to_state, dst_state, symbol);/////////////////?
+            }
+        }
+    }
+
+//    get_cycle_presence
+//    connect_to
+
+    @AllArgsConstructor
+    @Data
+    class CustomEdge {
+        String src;
+        String dst;
+        String symbol;
+    }
+
+    public void replace_node(String replacement_state, String new_state) {
+        List<CustomEdge> del_edges = new ArrayList<>();
+        List<CustomEdge> add_edges = new ArrayList<>();
+        for (Pair<String, String> pair: edges.keySet()) {
+            if(pair.getKey().equals(replacement_state)) {
+                if (pair.getValue().equals(replacement_state)) {
+                    for (String symbol : edges.get(pair)) {
+                        del_edges.add(new CustomEdge(pair.getKey(), pair.getValue(), symbol));
+                        add_edges.add(new CustomEdge(new_state, new_state, symbol));
+                    }
+                } else {
+                    for (String symbol : edges.get(pair)) {
+                        del_edges.add(new CustomEdge(pair.getKey(), pair.getValue(), symbol));
+                        add_edges.add(new CustomEdge(new_state, pair.getValue(), symbol));
+                    }
+                }
+            } else if(pair.getValue().equals(replacement_state)) {
+                for (String symbol : edges.get(pair)) {
+                    del_edges.add(new CustomEdge(pair.getKey(), pair.getValue(), symbol));
+                    add_edges.add(new CustomEdge(pair.getKey(), new_state, symbol));
+                }
+            }
+        }
+        for (CustomEdge customEdge : del_edges) {
+            del_edge(customEdge.getSrc(), customEdge.getDst(), customEdge.getSymbol());
+        }
+        for (CustomEdge customEdge : add_edges) {
+            add_edge(customEdge.getSrc(), customEdge.getDst(), customEdge.getSymbol());
+        }
+    }
 
 }
