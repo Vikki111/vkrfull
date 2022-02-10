@@ -21,7 +21,7 @@ public class ExerciseServiceImpl {
     }
 
 
-    public Boolean check(String graphJson, Integer exerciseId) {
+    public Boolean validate(String graphJson, Integer exerciseId) {
         log.debug("graph '{}' and exerciseId '{}'", graphJson, exerciseId);
         ObjectMapper objectMapper = new ObjectMapper();
         Graph graph = new Graph();

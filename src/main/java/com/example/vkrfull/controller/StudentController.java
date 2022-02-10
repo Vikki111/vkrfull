@@ -26,12 +26,12 @@ public class StudentController {
         this.exerciseService = exerciseService;
     }
 
-    @PostMapping(value = "/students/check")
+    @PostMapping(value = "/students/validate")
 //    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> check(@RequestBody Student student) {
+    public ResponseEntity<String> validate(@RequestBody Student student) {
         log.debug("studentBody '{}'", student);
-        exerciseService.check(student.getGraph(), student.getExerciseId());
-        return new ResponseEntity<>(HttpStatus.OK);
+        String result = exerciseService.validate(student.getGraph(), student.getExerciseId()).toString();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping(value = "/students")
