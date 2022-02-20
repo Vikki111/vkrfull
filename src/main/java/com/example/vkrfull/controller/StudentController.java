@@ -27,7 +27,7 @@ public class StudentController {
     }
 
     @PostMapping(value = "/students/validate")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> validate(@RequestBody Student student) {
         log.debug("studentBody '{}'", student);
         String result = exerciseService.validate(student.getGraph(), student.getExerciseId()).toString();
@@ -35,16 +35,16 @@ public class StudentController {
     }
 
     @PostMapping(value = "/students")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody Student student) {
         log.debug("studentBody '{}'", student);
-        studentService.create(student);
+        Student savedStudent = studentService.create(student);
         log.info("new entity is created");
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/students")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Student>> getAll() {
         final List<Student> students = studentService.getAll();
         log.info("get entity");
@@ -52,7 +52,7 @@ public class StudentController {
     }
 
     @GetMapping(value = "/students/{id}")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<Student> get(@PathVariable(name = "id") int id) {
         log.debug("id '{}'", id);
         final Student student = studentService.get(id);
@@ -61,7 +61,7 @@ public class StudentController {
     }
 
     @PutMapping(value = "/students/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(@PathVariable(name = "id") int id,
                                     @RequestBody Student student) {
         log.debug("studentBody '{}'", student);
@@ -70,7 +70,7 @@ public class StudentController {
     }
 
     @DeleteMapping(value = "/students/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
         studentService.delete(id);
         log.debug("id '{}'", id);

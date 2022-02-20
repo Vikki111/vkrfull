@@ -3,16 +3,26 @@ package com.example.vkrfull.controller;
 import com.example.vkrfull.model.Exercise;
 import com.example.vkrfull.service.ExerciseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.SimpleScriptContext;
+import java.io.*;
 import java.util.List;
+
+import static javatests.TestSupport.assertEquals;
 
 @Slf4j
 @RestController
@@ -26,25 +36,10 @@ public class ExerciseController {
         this.exerciseService = exerciseService;
     }
 
-    @RequestMapping("/pytest")
-    public String pytest() {
-        Runtime rt = Runtime.getRuntime();
-        String processString = "python3 HelloWorld.py";
-        System.out.println(processString);
 
-        try {
-            Process extractProcess = rt.exec(processString);
-            BufferedReader input = new BufferedReader(new InputStreamReader(extractProcess.getInputStream()));
-            String pyString = input.readLine();
-            return pyString;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "PYTHON DID NOT RUN";
-        }
-    }
 
     @PostMapping(value = "/exercises")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody Exercise exercise) {
         log.debug("exerciseBody '{}'", exercise);
         exerciseService.create(exercise);
@@ -53,7 +48,7 @@ public class ExerciseController {
     }
 
     @GetMapping(value = "/exercises")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Exercise>> getAll() {
         final List<Exercise> exercises = exerciseService.getAll();
         log.info("get entity");
@@ -61,7 +56,7 @@ public class ExerciseController {
     }
 
     @GetMapping(value = "/exercises/{id}")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<Exercise> get(@PathVariable(name = "id") int id) {
         log.debug("id '{}'", id);
         final Exercise exercise = exerciseService.get(id);
@@ -70,7 +65,7 @@ public class ExerciseController {
     }
 
     @PutMapping(value = "/exercises/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(@PathVariable(name = "id") int id,
                                     @RequestBody Exercise exercise) {
         log.debug("exerciseBody '{}'", exercise);
@@ -79,7 +74,7 @@ public class ExerciseController {
     }
 
     @DeleteMapping(value = "/exercises/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
         exerciseService.delete(id);
         log.debug("id '{}'", id);

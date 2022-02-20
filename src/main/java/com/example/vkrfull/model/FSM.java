@@ -414,7 +414,7 @@ public class FSM {
             this.fsm.start_state = state;
             List<String> list = new ArrayList<>();
             list.add(state);
-            this.fsm.final_states = this.expr(list, grammar.get(this.start_nonterm), 0);
+            this.fsm.final_states = this.expr(list, grammar.get(this.start_nonterm), 0).getStates();
         }
 
         public List<String> add_edges(List<String> parent_states, String symbol) {
@@ -449,7 +449,15 @@ public class FSM {
             return end_states;
         }
 
-        public void expr(List<String> parent_states, String rules, int index) {
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        class CustomExpr {
+            List<String> states;
+            int index;
+        }
+
+        public CustomExpr expr(List<String> parent_states, String rules, int index) {
             List<String> end_states = new ArrayList<>();
             List<String> begin_states = new ArrayList<>(parent_states);
             int state = 1;
@@ -554,7 +562,7 @@ public class FSM {
                         } else if (nonterm.equals("digitzero")) {
                             begin_states = this.digitzero(begin_states);
                         } else {
-                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0);
+                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0).getStates();
                         }
                         index++;
                         state = 12;
@@ -566,7 +574,7 @@ public class FSM {
                         } else if (nonterm.equals("digitzero")) {
                             begin_states = this.digitzero(begin_states);
                         } else {
-                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0);
+                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0).getStates();
                         }
                         for (String begin_state : begin_states) {
                             if(!end_states.contains(begin_state)) {
@@ -584,7 +592,7 @@ public class FSM {
                         } else if (nonterm.equals("digitzero")) {
                             begin_states = this.digitzero(begin_states);
                         } else {
-                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0);
+                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0).getStates();
                         }
                         index++;
                         state = 2;
@@ -600,7 +608,7 @@ public class FSM {
                         } else if (nonterm.equals("digitzero")) {
                             begin_states = this.digitzero(begin_states);
                         } else {
-                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0);
+                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0).getStates();
                         }
                         index++;
                         state = 6;
@@ -612,7 +620,7 @@ public class FSM {
                         } else if (nonterm.equals("digitzero")) {
                             begin_states = this.digitzero(begin_states);
                         } else {
-                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0);
+                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0).getStates();
                         }
                         index++;
                         state = 8;
@@ -624,7 +632,7 @@ public class FSM {
                         } else if (nonterm.equals("digitzero")) {
                             begin_states = this.digitzero(begin_states);
                         } else {
-                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0);
+                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0).getStates();
                         }
                         index++;
                         state = 10;
@@ -636,23 +644,155 @@ public class FSM {
                         } else if (nonterm.equals("digitzero")) {
                             begin_states = this.digitzero(begin_states);
                         } else {
-                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0);
+                            begin_states = this.expr(begin_states, this.grammar.get(nonterm), 0).getStates();
                         }
+                        state = 1000;
+                    }
+                } else if(state == 6) {
+                    //begin_states, index = self.__expr(begin_states, rules, index)
+                    CustomExpr customExpr = this.expr(begin_states, rules, index);
+                    begin_states = customExpr.getStates();
+                    index = customExpr.getIndex();
+                    state = 7;
+                } else if(state == 7) {
+                    if(String.valueOf(rules.charAt(index)).equals(")")) {
+                        index++;
+                        state = 12;
+                    } else {
+                        state = 666;
+                    }
+                } else if(state == 8) {
+                    List<String> tmp_begin_states = new ArrayList<>(begin_states);
+                    List<String> tmp_states = this.fsm.get_children(tmp_begin_states);
+//                    begin_states, index = self.__expr(begin_states, rules, index)
+                    CustomExpr customExpr = this.expr(begin_states, rules, index);
+                    begin_states = customExpr.getStates();
+                    index = customExpr.getIndex();
+                    List<String> second_states = new ArrayList<>(this.fsm.get_children(tmp_begin_states));
+                    second_states.removeAll(tmp_states);
+                    for (String tmp_state : second_states) {
+                        Map<String, List<String>> edges = this.fsm.get_input_edges(tmp_state);
+                        for (String end_state : begin_states) {
+                            for (String symbol : edges.keySet()) {
+                                this.fsm.add_edge(end_state, tmp_state, symbol);
+                            }
+                        }
+                    }
+                    for (String str : tmp_begin_states) {
+                        if (!begin_states.contains(str)) {
+                            begin_states.add(str);
+                        }
+                    }
+                    state = 9;
+                } else if(state == 9) {
+                    if(String.valueOf(rules.charAt(index)).equals("}")) {
+                        index++;
+                        state = 12;
+                    } else {
+                        state = 666;
+                    }
+                } else if (state == 10) {
+//                    tmp_states, index = self.__expr(begin_states, rules, index)
+                    CustomExpr customExpr = this.expr(begin_states, rules, index);
+                    List<String> tmp_states = customExpr.getStates();
+                    index = customExpr.getIndex();
+                    for (String str : tmp_states) {
+                        if (!begin_states.contains(str)) {
+                            begin_states.add(str);
+                        }
+                    }
+                    state = 11;
+                } else if(state == 11) {
+                    if(String.valueOf(rules.charAt(index)).equals("]")) {
+                        index++;
+                        state = 12;
+                    } else {
+                        state = 666;
+                    }
+                } else if (state == 12) {
+                    if(String.valueOf(rules.charAt(index)).equals(" ")) {
+                        index++;
+                        state = 12;
+                    } else if(String.valueOf(rules.charAt(index)).equals("|")) {
+                        for (String str : begin_states) {
+                            if (!end_states.contains(str)) {
+                                end_states.add(str);
+                            }
+                        }
+                        begin_states = new ArrayList<>(parent_states);
+                        index++;
+                        state = 1;
+                    } else if (String.valueOf(rules.charAt(index)).equals("\'")) {
+                        index++;
+                        state = 5;
+                    } else if(isLetter(rules.charAt(index))){
+                        nonterm = String.valueOf(rules.charAt(index));
+                        index++;
+                        state = 5;
+                    } else if(String.valueOf(rules.charAt(index)).equals("(")) {
+                        index++;
+                        state = 6;
+                    } else if(String.valueOf(rules.charAt(index)).equals("{")) {
+                        index++;
+                        state = 8;
+                    } else if(String.valueOf(rules.charAt(index)).equals("[")) {
+                        index++;
+                        state= 10;
+                    } else {
                         state = 1000;
                     }
                 }
             }
+            for (String str : begin_states) {
+                if (!end_states.contains(str)) {
+                    end_states.add(str);
+                }
+            }
+            return new CustomExpr(end_states, index);
         }
 
+        public List<String> alpha(List<String> parent_states) {
+            String new_state = this.fsm.get_new_state();
+            for (String parent_state: parent_states) {
+                this.fsm.add_edge(parent_state, new_state, "_");
+                for (int i = 65; i < 91; i++) {
+                    this.fsm.add_edge(parent_state, new_state, String.valueOf(i));
+                }
+            }
+            List<String> result = new ArrayList<>();
+            result.add(new_state);
+            return result;
+        }
 
+        public List<String> digit(List<String> parent_states) {
+            String new_state = this.fsm.get_new_state();
+            for (String parent_state : parent_states) {
+                for (int i = 1; i < 10; i++) {
+                    this.fsm.add_edge(parent_state, new_state, String.valueOf(i));
+                }
+            }
+            List<String> result = new ArrayList<>();
+            result.add(new_state);
+            return result;
+        }
+
+        public List<String> digitzero(List<String> parent_states) {
+            String new_state = this.fsm.get_new_state();
+            for (String parent_state : parent_states) {
+                for (int i = 0; i < 10; i++) {
+                    this.fsm.add_edge(parent_state, new_state, String.valueOf(i));
+                }
+            }
+            List<String> result = new ArrayList<>();
+            result.add(new_state);
+            return result;
+        }
+
+        public void automata_determination() {
+            this.fsm.automata_determination();
+            this.fsm.automata_minimize();
+            this.fsm.automata_renumerate();
+        }
     }
-
-//    __add_edges
-//    __add_space
-//    __add_optional_space
-//    __expr
-//    __alpha
-//    __digit
-//    __digitzero
 
 }

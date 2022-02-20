@@ -15,8 +15,8 @@ public class StudentServiceImpl {
         this.studentRepository = studentRepository;
     }
 
-    public void create(Student student) {
-        studentRepository.save(student);
+    public Student create(Student student) {
+        return studentRepository.save(student);
     }
 
     public void update(Student newStudent, int id) {

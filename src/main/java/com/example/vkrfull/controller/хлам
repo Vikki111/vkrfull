@@ -1,0 +1,147 @@
+ @RequestMapping("/pytest")
+    public void pytest() {
+//        Runtime rt = Runtime.getRuntime();
+////        String processString = "python3 HelloWorld.py";
+//        String processString = "python3 HelloWorld.py";
+//
+//        System.out.println(processString);
+//
+//        try {
+//            Process extractProcess = rt.exec(processString);
+//            BufferedReader input = new BufferedReader(new InputStreamReader(extractProcess.getInputStream()));
+//            String pyString = input.readLine();
+//            System.out.println(pyString);
+//            return pyString;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return "PYTHON DID NOT RUN";
+//        }
+
+
+        String s = null;
+
+        try {
+
+            Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/test.py");
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(p.getInputStream()));
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(p.getErrorStream()));
+
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println("1 "+s);
+            }
+            while ((s = stdError.readLine()) != null) {
+                System.out.println("2 " +s);
+            }
+
+        }
+        catch (IOException e) {
+            System.out.println("exception happened - here's what I know: ");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+
+    @RequestMapping("/pytest2")
+    public void pytest2() {
+
+//        StringWriter writer = new StringWriter();
+//        ScriptContext context = new SimpleScriptContext();
+//        context.setWriter(writer);
+//
+//        ScriptEngineManager manager = new ScriptEngineManager();
+//        ScriptEngine engine = manager.getEngineByName("python");
+//        engine.eval(new FileReader(resolvePythonScriptPath("hello.py")), context);
+
+//        try (PythonInterpreter pyInterp = new PythonInterpreter()) {
+//            StringWriter output = new StringWriter();
+//            pyInterp.setOut(output);
+//
+//            pyInterp.exec("print('Hello Baeldung Readers!!')");
+//            System.out.println(output.toString());
+//        }
+
+        try (PythonInterpreter pyInterp = new PythonInterpreter()) {
+            StringWriter output = new StringWriter();
+            pyInterp.setOut(output);
+//            pyInterp.execfile("src/main/java/com/example/vkrfull/controller/maintestjava.py");
+            pyInterp.execfile("src/main/java/com/example/vkrfull/controller/test.py");
+//            pyInterp.exec("print('Hello Baeldung Readers!!')");
+
+            PyObject someFunc = pyInterp.get("main");
+            String grammer = "start = 'TYPE 'id '_=_' ( simpletype | arrtype | rectype | settype | pntrtype ) '_;' \n" +
+            "simpletype = 'CARDINAL' | 'INTEGER' | 'REAL' | 'CHAR' | 'BOOLEAN' | '[_1..' uintnumb '_]' | '(_' uintnumb { '_,_' uintnumb } '_)' \n" +
+            "arrtype = 'ARRAY ' bounds ' OF ' simpletype \n" +
+            "bounds = bound { '_,_' bound } \n" +
+            "bound = '_[_' intnumb '..' intnumb '_]_' \n" +
+            "rectype = 'RECORD ' id { '_,_' id } '_:_' simpletype ' END' \n" +
+            "settype = 'SET OF ' simpletype \n" +
+            "pntrtype = 'POINTER TO ' simpletype \n" +
+            "uintnumb = '0' | digit { digitzero } \n" +
+            "intnumb = '0' | ['-'] digit { digitzero } \n" +
+            "id = alpha { alpha | digitzero } ";
+
+            String grammer2 = "start = TYPE id _=_ ( simpletype | arrtype | rectype | settype | pntrtype ) _; \n" +
+                    "simpletype = CARDINAL | INTEGER | REAL | CHAR | BOOLEAN | [_1.. uintnumb _] | (_ uintnumb { _,_ uintnumb } _) \n" +
+                    "arrtype = ARRAY  bounds  OF  simpletype \n" +
+                    "bounds = bound { _,_ bound } \n" +
+                    "bound = _[_ intnumb .. intnumb _]_ \n" +
+                    "rectype = RECORD  id { _,_ id } _:_ simpletype  END \n" +
+                    "settype = SET OF  simpletype \n" +
+                    "pntrtype = POINTER TO  simpletype \n" +
+                    "uintnumb = 0 | digit { digitzero } \n" +
+                    "intnumb = 0 | [-] digit { digitzero } \n" +
+                    "id = alpha { alpha | digitzero } ";
+
+            PyObject result = someFunc.__call__(new PyString("24"));
+//            String realResult = (String) result.__tojava__(String.class);
+//            System.out.println(realResult);
+            System.out.println("2 " + output.toString());
+        }
+
+
+    }
+
+    @RequestMapping("/pytest3")
+    public void pytest3() {
+
+        String line = "python3 " + "src/main/java/com/example/vkrfull/controller/HelloWorld.py";
+        CommandLine cmdLine = CommandLine.parse(line);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+
+        DefaultExecutor executor = new DefaultExecutor();
+        executor.setStreamHandler(streamHandler);
+
+        try {
+            int exitCode = executor.execute(cmdLine);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        String pythonScriptPath = "/home/norbert/python/helloPython.py";
+//        String[] cmd = new String[2];
+//        cmd[0] = "python"; // check version of installed python: python -V
+//        cmd[1] = pythonScriptPath;
+//
+//        Runtime rt = Runtime.getRuntime();
+//        Process pr = null;
+//        try {
+//            pr = rt.exec(cmd);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        BufferedReader bfr = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+//        String line = "";
+//        while(true) {
+//            try {
+//                if ((line = bfr.readLine()) == null) break;
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println(line);
+
+    }
