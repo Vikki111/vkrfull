@@ -1,6 +1,7 @@
 package com.example.vkrfull.controller;
 
 import com.example.vkrfull.model.Student;
+import com.example.vkrfull.model.StudentFilterBody;
 import com.example.vkrfull.service.ExerciseServiceImpl;
 import com.example.vkrfull.service.StudentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +38,19 @@ public class StudentController {
     @PostMapping(value = "/students")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody Student student) {
-        log.debug("studentBody '{}'", student);
+        log.debug("student '{}'", student);
         Student savedStudent = studentService.create(student);
         log.info("new entity is created");
         return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/students/find")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> find(@RequestBody StudentFilterBody studentFilterBody) {
+        log.debug("studentBody '{}'", studentFilterBody);
+        List<Student> students = studentService.find(studentFilterBody);
+        log.info("Students found: {}", students);
+        return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
     @GetMapping(value = "/students")

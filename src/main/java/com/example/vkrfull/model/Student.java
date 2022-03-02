@@ -26,7 +26,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "student")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})//////////////
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
