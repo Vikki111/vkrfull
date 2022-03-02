@@ -29,11 +29,11 @@ public class StudentRepositoryImpl {
 
         List<Predicate> predicates = new ArrayList<>();
         if (!isEmpty(studentFilterBody.getFirstName())) {
-            Predicate predicate = criteriaBuilder.like(root.get("firstName"), "%"+studentFilterBody.getFirstName()+"%");
+            Predicate predicate = criteriaBuilder.like(criteriaBuilder.upper(root.get("firstName")), "%"+studentFilterBody.getFirstName().toUpperCase()+"%");
             predicates.add(predicate);
         }
         if (!isEmpty(studentFilterBody.getLastName())) {
-            Predicate predicate = criteriaBuilder.like(root.get("lastName"), "%"+studentFilterBody.getLastName()+"%");
+            Predicate predicate = criteriaBuilder.like(criteriaBuilder.upper(root.get("lastName")), "%"+studentFilterBody.getLastName().toUpperCase()+"%");
             predicates.add(predicate);
         }
         if (!isEmpty(studentFilterBody.getDepartment())) {
@@ -49,7 +49,7 @@ public class StudentRepositoryImpl {
             predicates.add(predicate);
         }
         if (!isEmpty(studentFilterBody.getPatronymic())) {
-            Predicate predicate = criteriaBuilder.equal(root.get("patronymic"), studentFilterBody.getPatronymic());
+            Predicate predicate = criteriaBuilder.equal(criteriaBuilder.upper(root.get("patronymic")), studentFilterBody.getPatronymic().toUpperCase());
             predicates.add(predicate);
         }
         if (nonNull(studentFilterBody.getExerciseId())) {

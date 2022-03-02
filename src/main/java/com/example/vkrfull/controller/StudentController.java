@@ -47,7 +47,7 @@ public class StudentController {
     @PostMapping(value = "/students/find")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> find(@RequestBody StudentFilterBody studentFilterBody) {
-        log.debug("studentBody '{}'", studentFilterBody);
+        log.info("studentBody '{}'", studentFilterBody);
         List<Student> students = studentService.find(studentFilterBody);
         log.info("Students found: {}", students);
         return new ResponseEntity<>(students, HttpStatus.OK);

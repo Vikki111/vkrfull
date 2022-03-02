@@ -14,7 +14,6 @@ public class StudentFilterBody {
     private String patronymic;
     private String department;
     private Integer mark;
-    private String graph;
     private Boolean ready;
     private String comment;
     private Integer exerciseId;
