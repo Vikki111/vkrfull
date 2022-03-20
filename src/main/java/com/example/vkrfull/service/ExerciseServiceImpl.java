@@ -1,5 +1,6 @@
 package com.example.vkrfull.service;
 
+import com.example.vkrfull.model.Edge;
 import com.example.vkrfull.model.Exercise;
 import com.example.vkrfull.model.Graph;
 import com.example.vkrfull.repository.ExerciseRepository;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -20,8 +22,29 @@ public class ExerciseServiceImpl {
         this.exerciseRepository = exerciseRepository;
     }
 
+    public Graph parsePythonResponse(String str) {
+        str = str.replaceAll("[({')]", "");
+        str = str.replaceAll("}", "/");
+        str = str.substring(0, str.length()-2);
+        System.out.println(str);
+        String[] strings = str.split("/, ");
+        Graph graph = new Graph();
+        graph.setEdges(new ArrayList<>());
+        for (String str1: strings) {
+            String[] leftright = str1.split(": ");
+            String[] left = leftright[0].split(", ");
+            String[] right = leftright[1].split(", ");
+            String source = left[0];
+            String target = left[1];
+            for (String label : right) {
+                graph.getEdges().add(new Edge(source, target, label));
+            }
+        }
+        System.out.println(graph.getEdges());
+        return graph;
+    }
 
-    public Boolean validate(String graphJson, Integer exerciseId) {
+    public Boolean validate(Graph pythonGraph, String graphJson, Integer exerciseId) {
         log.debug("graph '{}' and exerciseId '{}'", graphJson, exerciseId);
         ObjectMapper objectMapper = new ObjectMapper();
         Graph graph = new Graph();
@@ -31,7 +54,8 @@ public class ExerciseServiceImpl {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(graph);
+        System.out.println("python graph"+ pythonGraph);
+        System.out.println("stud graph " + graph);
         return true;
     }
 

@@ -1,5 +1,6 @@
 package com.example.vkrfull.controller;
 
+import com.example.vkrfull.model.Graph;
 import com.example.vkrfull.model.Student;
 import com.example.vkrfull.model.StudentFilterBody;
 import com.example.vkrfull.service.ExerciseServiceImpl;
@@ -11,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 @Slf4j
@@ -28,11 +32,46 @@ public class StudentController {
     }
 
     @PostMapping(value = "/students/validate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<String> validate(@RequestBody Student student) {
         log.debug("studentBody '{}'", student);
-        String result = exerciseService.validate(student.getGraph(), student.getExerciseId()).toString();
+
+        Graph pythonGraph = new Graph();
+
+        try {
+            String s = null;
+            Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/maintestjava.py");
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(p.getInputStream()));
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(p.getErrorStream()));
+
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println("1 "+s);
+                pythonGraph = exerciseService.parsePythonResponse(s);
+            }
+            while ((s = stdError.readLine()) != null) {
+                System.out.println("2 " +s);
+            }
+
+        }
+        catch (IOException e) {
+            System.out.println("exception happened ");
+            e.printStackTrace();
+        }
+
+
+        String result = exerciseService.validate(pythonGraph, student.getGraph(), student.getExerciseId()).toString();
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/students/graph/{id}")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public String getGraph(@PathVariable(name = "id") int id) {
+        log.info("student id '{}'", id);
+        String result = studentService.get(id).getGraph();
+        log.info("student graph:  {}", result);
+        return result;
     }
 
     @PostMapping(value = "/students")

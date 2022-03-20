@@ -3,26 +3,16 @@ package com.example.vkrfull.controller;
 import com.example.vkrfull.model.Exercise;
 import com.example.vkrfull.service.ExerciseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.python.core.PyObject;
-import org.python.core.PyString;
-import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleScriptContext;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-
-import static javatests.TestSupport.assertEquals;
 
 @Slf4j
 @RestController
@@ -36,7 +26,33 @@ public class ExerciseController {
         this.exerciseService = exerciseService;
     }
 
+    @GetMapping(value = "/pytest5")
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> pytest() {
+        try {
+            String s = null;
+            Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/maintestjava.py");
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(p.getInputStream()));
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(p.getErrorStream()));
 
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println("1 "+s);
+                exerciseService.parsePythonResponse(s);
+            }
+            while ((s = stdError.readLine()) != null) {
+                System.out.println("2 " +s);
+            }
+
+        }
+        catch (IOException e) {
+            System.out.println("exception happened - here's what I know: ");
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @PostMapping(value = "/exercises")
     @PreAuthorize("hasRole('ADMIN')")

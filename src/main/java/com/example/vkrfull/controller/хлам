@@ -43,6 +43,16 @@
         }
     }
 
+Запускает простой скрипт НО
+
+Ошбика в большом
+
+2 Traceback (most recent call last):
+2   File "C:\Users\Vika\Desktop\vkrfull\src\main\java\com\example\vkrfull\controller\maintestjava.py", line 1, in <module>
+2     from graphviz import Digraph
+2 ModuleNotFoundError: No module named 'graphviz'
+
+
     @RequestMapping("/pytest2")
     public void pytest2() {
 
@@ -54,6 +64,9 @@
 //        ScriptEngine engine = manager.getEngineByName("python");
 //        engine.eval(new FileReader(resolvePythonScriptPath("hello.py")), context);
 
+Ошибка:
+        ("mismatched input ':' expecting RPAREN", ('src/main/java/com/example/vkrfull/controller/maintestjava.py', 25, 32, '    def final_states(self, nodes: set):\n'))
+
 //        try (PythonInterpreter pyInterp = new PythonInterpreter()) {
 //            StringWriter output = new StringWriter();
 //            pyInterp.setOut(output);
@@ -61,6 +74,9 @@
 //            pyInterp.exec("print('Hello Baeldung Readers!!')");
 //            System.out.println(output.toString());
 //        }
+
+этот кусок с динамическим скриптом запускается
+
 
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             StringWriter output = new StringWriter();
@@ -100,6 +116,9 @@
             System.out.println("2 " + output.toString());
         }
 
+        Ошибка:
+        ("mismatched input ':' expecting RPAREN", ('src/main/java/com/example/vkrfull/controller/maintestjava.py', 25, 32, '    def final_states(self, nodes: set):\n'))
+
 
     }
 
@@ -120,6 +139,9 @@
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        выкидывает
+        Process exited with an error: 9009 (Exit value: 9009)
 
 //        String pythonScriptPath = "/home/norbert/python/helloPython.py";
 //        String[] cmd = new String[2];
@@ -145,3 +167,27 @@
 //            System.out.println(line);
 
     }
+
+    результат: ноль эмоций
+
+
+    МАРТ
+
+    ProcessBuilder processBuilder = new ProcessBuilder("python", "src/main/java/com/example/vkrfull/controller/maintestjava.py");
+            processBuilder.redirectErrorStream(true);
+
+            Process process = processBuilder.start();
+    //        List<String> results = readProcessOutput(process.getInputStream());
+            String response = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()))
+                    .lines().collect(Collectors.joining("\n"));
+            System.out.println(response);
+            int exitCode = process.waitFor();
+            System.out.println("e "+exitCode);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+            выкидывает следующее
+
+     File "C:\Users\Vika\Desktop\vkrfull\src\main\java\com\example\vkrfull\controller\maintestjava.py", line 1, in <module>
+        from graphviz import Digraph
+    ModuleNotFoundError: No module named 'graphviz'

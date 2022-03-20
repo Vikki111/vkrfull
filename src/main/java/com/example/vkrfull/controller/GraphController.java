@@ -5,6 +5,7 @@ import com.example.vkrfull.service.ExerciseServiceImpl;
 import com.example.vkrfull.service.StudentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,7 @@ public class GraphController {
         this.exerciseService = exerciseService;
     }
 
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @RequestMapping(value = { "/savejson" }, method = RequestMethod.POST)
     public String savejson(@RequestHeader(value = "student-id") int studentId,
                             @RequestBody String graph) {

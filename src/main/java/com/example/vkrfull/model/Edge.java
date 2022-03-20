@@ -31,4 +31,19 @@ public class Edge {
     private boolean isSelected;
     @JsonProperty(value = "label")
     private String label;
+
+    public Edge(String source, String target, String label) {
+        this.source = source;
+        this.target = target;
+        this.label = label;
+    }
+
+    @Override
+    public String toString() {
+        return "Edge{" +
+                "source='" + source + '\'' +
+                ", target='" + target + '\'' +
+                ", label='" + label + '\'' +
+                '}';
+    }
 }
