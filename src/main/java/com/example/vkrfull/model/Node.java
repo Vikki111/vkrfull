@@ -40,4 +40,11 @@ public class Node {
     private String color;
     @JsonProperty(value = "isSelected")
     private boolean isSelected;
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "label='" + label + '\'' +
+                '}';
+    }
 }

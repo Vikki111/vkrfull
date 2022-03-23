@@ -51,7 +51,7 @@ public class StudentController {
 
             while ((s = stdInput.readLine()) != null) {
                 System.out.println("RESPONSE: "+s);
-                exerciseService.parsePythonResponse(s);
+                pythonGraph = exerciseService.parsePythonResponse(s);
             }
             while ((s = stdError.readLine()) != null) {
                 System.out.println("ERROR: " +s);

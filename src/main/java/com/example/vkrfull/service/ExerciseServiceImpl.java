@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -45,16 +46,87 @@ public class ExerciseServiceImpl {
     public Boolean validate(Graph pythonGraph, String graphJson, Integer exerciseId) {
         log.debug("graph '{}' and exerciseId '{}'", graphJson, exerciseId);
         ObjectMapper objectMapper = new ObjectMapper();
-        Graph graph = new Graph();
+        Graph studGraph = new Graph();
         try {
-            graph = objectMapper.readValue(graphJson, Graph.class);
+            studGraph = objectMapper.readValue(graphJson, Graph.class);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+        parseStudentGraph(studGraph);
         System.out.println("python graph"+ pythonGraph);
-        System.out.println("stud graph " + graph);
+        System.out.println("stud graph " + studGraph);
         return true;
+    }
+
+    public void parseStudentGraph(Graph studGraph) {
+        List<Edge> newEdges = new ArrayList<>(studGraph.getEdges());
+        for (Edge edge : studGraph.getEdges()) {
+            String str = edge.getLabel();
+            if (edge.getLabel().contains("space")) {
+                newEdges.remove(edge);
+                newEdges.add(new Edge(edge.getSource(), edge.getTarget(), " "));
+            }
+            if (edge.getLabel().contains("A|...|Z")) {
+                str = str.replaceAll("A\\|...\\|Z", "");
+                alpha(newEdges, edge);
+            }
+            if (edge.getLabel().contains("1|...|9")) {
+                str = str.replaceAll("1\\|...\\|9", "");
+                digit(newEdges, edge);
+            }
+            if (edge.getLabel().contains("0|...|9")) {
+                str = str.replaceAll("0\\|...\\|9", "");
+                digitzero(newEdges, edge);
+            }
+            if (str.contains("|")) {
+                newEdges.remove(edge);
+                String[] strings = str.split("\\|");
+                for (String symbol : strings) {
+                    if (!symbol.equals("")) {
+                        newEdges.add(new Edge(edge.getSource(), edge.getTarget(), symbol));
+                    }
+                }
+            }
+        }
+        studGraph.getEdges().clear();
+        studGraph.getEdges().addAll(newEdges);
+    }
+
+    public void alpha(List<Edge> newEdges, Edge edge) {
+        for (Edge edge1 : newEdges) {
+            if (edge1.isSame(edge)) {
+                newEdges.remove(edge1);
+                break;
+            }
+        }
+        for (int i = 65; i < 91; i++) {
+            newEdges.add(new Edge(edge.getSource(), edge.getTarget(), String.valueOf((char)i)));
+        }
+    }
+
+    public void digit(List<Edge> newEdges, Edge edge) {
+        for (Edge edge1 : newEdges) {
+            if (edge1.isSame(edge)) {
+                newEdges.remove(edge1);
+                break;
+            }
+        }
+        for (int i = 1; i < 10; i++) {
+            newEdges.add(new Edge(edge.getSource(), edge.getTarget(), String.valueOf(i)));
+        }
+    }
+
+    public void digitzero(List<Edge> newEdges, Edge edge) {
+        for (Edge edge1 : newEdges) {
+            if (edge1.isSame(edge)) {
+                newEdges.remove(edge1);
+                break;
+            }
+        }
+        for (int i = 0; i < 10; i++) {
+            newEdges.add(new Edge(edge.getSource(), edge.getTarget(), String.valueOf(i)));
+        }
     }
 
     public void create(Exercise exercise) {

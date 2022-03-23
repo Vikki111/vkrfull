@@ -38,6 +38,15 @@ public class Edge {
         this.label = label;
     }
 
+    public boolean isSame(Edge edge) {
+        if (this.source.equals(edge.getSource())
+                && this.target.equals(edge.getTarget())
+                && this.label.equals(edge.getLabel())) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Edge{" +

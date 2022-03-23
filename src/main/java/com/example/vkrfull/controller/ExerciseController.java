@@ -55,7 +55,7 @@ public class ExerciseController {
 
             while ((s = stdInput.readLine()) != null) {
                 System.out.println("RESPONSE: "+s);
-                //exerciseService.parsePythonResponse(s);
+                exerciseService.parsePythonResponse(s);
             }
             while ((s = stdError.readLine()) != null) {
                 System.out.println("ERROR: " +s);
