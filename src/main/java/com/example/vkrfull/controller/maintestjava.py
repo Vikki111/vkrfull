@@ -1,4 +1,4 @@
-# from graphviz import Digraph
+import sys
 from collections import deque
 
 class FSM:
@@ -621,16 +621,16 @@ class Worker:
         self.__fsm.automata_minimize()
         self.__fsm.automata_renumerate()
 
+def replace(str1):
+    str1 = str1.replace('///', ' \n')
+    str1 = str1.replace('/', ' ')
+    return str1
+
 def run():
     number = '17'
-    gr = Worker('start', "start = 'FOR ' var '_:=_' intnumb ' TO ' intnumb [' BY ' intnumb ] ' DO' \n"
-                         "var = id [ '_[_' indexes '_]_' ] \n"
-                         "indexes = index { '_,_' index } \n"
-                         "index = id | intnumb \n"
-                         "intnumb = '0' | ['-'] digit { digitzero } \n"
-                         "id = alpha { alpha | digitzero } ")
+#     print(replace(str(sys.argv[1])))
+    gr = Worker('start', replace(str(sys.argv[1])))
 
-    # print(gr)
     gr.automata_determination()
 
 

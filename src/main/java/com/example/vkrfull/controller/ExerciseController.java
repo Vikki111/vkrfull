@@ -30,19 +30,35 @@ public class ExerciseController {
 //    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> pytest() {
         try {
+            String gr = "start = 'FOR ' var '_:=_' intnumb ' TO ' intnumb [' BY ' intnumb ] ' DO' \n"+
+                    "var = id [ '_[_' indexes '_]_' ] \n"+
+                    "indexes = index { '_,_' index } \n"+
+                    "index = id | intnumb \n"+
+                    "intnumb = '0' | ['-'] digit { digitzero } \n"+
+                    "id = alpha { alpha | digitzero } ";
+            String gr2 = "start = 'FOR ' var '_:=_' intnumb ' TO ' intnumb [' BY ' intnumb ] ' DO' \\nvar = id [ '_[_' indexes '_]_' ] \\nindexes = index { '_,_' index } \\nindex = id | intnumb \\nintnumb = '0' | ['-'] digit { digitzero } \\nid = alpha { alpha | digitzero } ";
+            String gr3 = "start/=/\'FOR/\'/var/\'_:=_\'/intnumb/\'/TO/\'/intnumb/[\'/BY/\'/intnumb/]/\'/DO\'///"+
+                    "var/=/id/[/\'_[_\'/indexes/\'_]_\'/]///"+
+                    "indexes/=/index/{/\'_,_\'/index/}///"+
+                    "index/=/id/|/intnumb///"+
+                    "intnumb/=/\'0\'/|/[\'-\']/digit/{/digitzero/}///"+
+                    "id/=/alpha/{/alpha/|/digitzero/}/";
+            String ex = gr2;
+            ex = ex.replaceAll(" \\\\n", "///");
+            ex = ex.replaceAll(" ", "/");
             String s = null;
-            Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/maintestjava.py");
+            Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/maintestjava.py "+ex);
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(p.getInputStream()));
             BufferedReader stdError = new BufferedReader(new
                     InputStreamReader(p.getErrorStream()));
 
             while ((s = stdInput.readLine()) != null) {
-                System.out.println("1 "+s);
-                exerciseService.parsePythonResponse(s);
+                System.out.println("RESPONSE: "+s);
+                //exerciseService.parsePythonResponse(s);
             }
             while ((s = stdError.readLine()) != null) {
-                System.out.println("2 " +s);
+                System.out.println("ERROR: " +s);
             }
 
         }

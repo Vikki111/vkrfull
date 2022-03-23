@@ -35,23 +35,26 @@ public class StudentController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<String> validate(@RequestBody Student student) {
         log.debug("studentBody '{}'", student);
+        String ex = exerciseService.get(student.getExerciseId()).getExercise();
+        ex = ex.replaceAll(" \\\\n", "///");
+        ex = ex.replaceAll(" ", "/");
 
         Graph pythonGraph = new Graph();
 
         try {
             String s = null;
-            Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/maintestjava.py");
+            Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/maintestjava.py "+ex);
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(p.getInputStream()));
             BufferedReader stdError = new BufferedReader(new
                     InputStreamReader(p.getErrorStream()));
 
             while ((s = stdInput.readLine()) != null) {
-                System.out.println("1 "+s);
-                pythonGraph = exerciseService.parsePythonResponse(s);
+                System.out.println("RESPONSE: "+s);
+                exerciseService.parsePythonResponse(s);
             }
             while ((s = stdError.readLine()) != null) {
-                System.out.println("2 " +s);
+                System.out.println("ERROR: " +s);
             }
 
         }

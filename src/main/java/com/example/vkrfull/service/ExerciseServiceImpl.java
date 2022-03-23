@@ -26,7 +26,6 @@ public class ExerciseServiceImpl {
         str = str.replaceAll("[({')]", "");
         str = str.replaceAll("}", "/");
         str = str.substring(0, str.length()-2);
-        System.out.println(str);
         String[] strings = str.split("/, ");
         Graph graph = new Graph();
         graph.setEdges(new ArrayList<>());
@@ -40,7 +39,6 @@ public class ExerciseServiceImpl {
                 graph.getEdges().add(new Edge(source, target, label));
             }
         }
-        System.out.println(graph.getEdges());
         return graph;
     }
 
