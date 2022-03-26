@@ -2,7 +2,8 @@ package com.example.vkrfull.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -24,8 +25,10 @@ public class User {
 
     private String password;
 
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Long student;
 
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(	name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
