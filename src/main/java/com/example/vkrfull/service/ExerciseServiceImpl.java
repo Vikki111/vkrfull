@@ -60,12 +60,26 @@ public class ExerciseServiceImpl {
     }
 
     public void parseStudentGraph(Graph studGraph) {
+        // A|...|Z
+        // (_|A|...|Z\E)|0|...|9
+        // 0|...|9
+        // *|-|+|/
+        // =|>
+        // K|L|M|P
         List<Edge> newEdges = new ArrayList<>(studGraph.getEdges());
         for (Edge edge : studGraph.getEdges()) {
             String str = edge.getLabel();
             if (edge.getLabel().contains("space")) {
                 newEdges.remove(edge);
                 newEdges.add(new Edge(edge.getSource(), edge.getTarget(), " "));
+            }
+            if (edge.getLabel().contains("\\")) {
+                Character character = edge.getLabel().charAt(edge.getLabel().indexOf("\\")+1);
+                str = str.replaceAll("[()]", "");
+                str = str.replaceAll("A\\|...\\|Z", "");
+                str = str.replace("\\", "");
+                str = str.replace(character.toString(), "");
+                alphaWithoutChar(newEdges, edge, character);
             }
             if (edge.getLabel().contains("A|...|Z")) {
                 str = str.replaceAll("A\\|...\\|Z", "");
@@ -91,6 +105,20 @@ public class ExerciseServiceImpl {
         }
         studGraph.getEdges().clear();
         studGraph.getEdges().addAll(newEdges);
+    }
+
+    public void alphaWithoutChar(List<Edge> newEdges, Edge edge, Character character) {
+        for (Edge edge1 : newEdges) {
+            if (edge1.isSame(edge)) {
+                newEdges.remove(edge1);
+                break;
+            }
+        }
+        for (int i = 65; i < 91; i++) {
+            if (!character.equals((char)i)) {
+                newEdges.add(new Edge(edge.getSource(), edge.getTarget(), String.valueOf((char) i)));
+            }
+        }
     }
 
     public void alpha(List<Edge> newEdges, Edge edge) {

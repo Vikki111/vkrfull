@@ -92,6 +92,7 @@ public class ExerciseController {
     public ResponseEntity<Exercise> get(@PathVariable(name = "id") int id) {
         log.debug("id '{}'", id);
         final Exercise exercise = exerciseService.get(id);
+//        exercise.setExercise(exercise.getExercise().replaceAll("\\\\n", "&#13;&#10;"));
         log.debug("exercise '{}'", exercise);
         return new ResponseEntity<>(exercise, HttpStatus.OK);
     }
