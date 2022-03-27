@@ -231,7 +231,7 @@ public class ExerciseServiceImpl {
         return symbols;
     }
 
-    public Boolean validate(Graph pythonGraph, String graphJson, Integer exerciseId) {
+    public String validate(Graph pythonGraph, String graphJson, Integer exerciseId) {
         log.debug("graph '{}' and exerciseId '{}'", graphJson, exerciseId);
         ObjectMapper objectMapper = new ObjectMapper();
         Graph studGraph = new Graph();
@@ -241,7 +241,10 @@ public class ExerciseServiceImpl {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        parseStudentGraph(studGraph);
+        String responseParseStudGraph = parseStudentGraph(studGraph);
+        if (!responseParseStudGraph.equals("true")) {
+            return responseParseStudGraph;
+        }
         this.pythonGraph = pythonGraph;
         this.studGraph = studGraph;
         fillVertex(pythonGraph);
@@ -253,7 +256,7 @@ public class ExerciseServiceImpl {
 //        boolean test = comparator();// не работает
         System.out.println("python graph"+ pythonGraph);
         System.out.println("stud graph " + studGraph);
-        return true;
+        return "true";
     }
 
     public Graph parsePythonResponse(String str) {
@@ -276,7 +279,7 @@ public class ExerciseServiceImpl {
         return graph;
     }
 
-    public void parseStudentGraph(Graph studGraph) {
+    public String parseStudentGraph(Graph studGraph) {
         // A|...|Z
         // (_|A|...|Z\E)|0|...|9
         // 0|...|9
@@ -288,6 +291,7 @@ public class ExerciseServiceImpl {
             String str = edge.getLabel();
             if (str == null) {
                 System.out.println("Empty label between: "+edge.getSource() + " "+ edge.getTarget());
+                return "Empty label between: "+edge.getSource() + " "+ edge.getTarget();
             }
             if (edge.getLabel().contains("space")) {
                 newEdges.remove(edge);
@@ -317,6 +321,9 @@ public class ExerciseServiceImpl {
                 newEdges.remove(edge);
                 String[] strings = str.split("\\|");
                 for (String symbol : strings) {
+                    if(symbol.length() > 1) {
+                        return "Incorrect label between: "+edge.getSource() + " "+ edge.getTarget();
+                    }
                     if (!symbol.equals("")) {
                         newEdges.add(new Edge(edge.getSource(), edge.getTarget(), symbol));
                     }
@@ -325,6 +332,7 @@ public class ExerciseServiceImpl {
         }
         studGraph.getEdges().clear();
         studGraph.getEdges().addAll(newEdges);
+        return "true";
     }
 
     public void alphaWithoutChar(List<Edge> newEdges, Edge edge, Character character) {

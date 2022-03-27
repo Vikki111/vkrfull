@@ -25,8 +25,14 @@ public class User {
 
     private String password;
 
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Long student;
+    private Integer student;
+
+    @Transient
+    private String lastName;
+    @Transient
+    private String firstName;
+    @Transient
+    private String department;
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToMany(fetch = FetchType.LAZY)

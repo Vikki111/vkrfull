@@ -17,6 +17,6 @@ public class SignupRequest {
 
     private String password;
 
-    private Long student;
+    private Integer student;
 
 }

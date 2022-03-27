@@ -3,6 +3,8 @@ package com.example.vkrfull.controller;
 import com.example.vkrfull.model.Graph;
 import com.example.vkrfull.model.Student;
 import com.example.vkrfull.model.StudentFilterBody;
+import com.example.vkrfull.security.User;
+import com.example.vkrfull.security.UserRepository;
 import com.example.vkrfull.service.ExerciseServiceImpl;
 import com.example.vkrfull.service.StudentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +26,15 @@ public class StudentController {
 
     private final StudentServiceImpl studentService;
     private final ExerciseServiceImpl exerciseService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public StudentController(StudentServiceImpl studentService, ExerciseServiceImpl exerciseService) {
+    public StudentController(StudentServiceImpl studentService,
+                             ExerciseServiceImpl exerciseService,
+                             UserRepository userRepository) {
         this.studentService = studentService;
         this.exerciseService = exerciseService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping(value = "/students/validate")
@@ -38,17 +44,12 @@ public class StudentController {
         String ex = exerciseService.get(student.getExerciseId()).getExercise();
         ex = ex.replaceAll(" \\\\n", "///");
         ex = ex.replaceAll(" ", "/");
-
         Graph pythonGraph = new Graph();
-
         try {
             String s = null;
             Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/maintestjava.py "+ex);
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(p.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(p.getErrorStream()));
-
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             while ((s = stdInput.readLine()) != null) {
                 System.out.println("RESPONSE: "+s);
                 pythonGraph = exerciseService.parsePythonResponse(s);
@@ -56,15 +57,12 @@ public class StudentController {
             while ((s = stdError.readLine()) != null) {
                 System.out.println("ERROR: " +s);
             }
-
         }
         catch (IOException e) {
             System.out.println("exception happened ");
             e.printStackTrace();
         }
-
-
-        String result = exerciseService.validate(pythonGraph, student.getGraph(), student.getExerciseId()).toString();
+        String result = exerciseService.validate(pythonGraph, student.getGraph(), student.getExerciseId());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -80,9 +78,9 @@ public class StudentController {
     @PostMapping(value = "/students")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody Student student) {
-        log.debug("student '{}'", student);
+        log.info("student '{}'", student);
         Student savedStudent = studentService.create(student);
-        log.info("new entity is created");
+        log.info("new student is created with id: {}", student.getId());
         return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
     }
 
@@ -124,6 +122,8 @@ public class StudentController {
     @DeleteMapping(value = "/students/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
+        User user = userRepository.findByStudent(id).get();
+        userRepository.delete(user);
         studentService.delete(id);
         log.debug("id '{}'", id);
         return new ResponseEntity<>(HttpStatus.OK);
