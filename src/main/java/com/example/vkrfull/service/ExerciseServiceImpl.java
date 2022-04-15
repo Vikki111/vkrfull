@@ -398,8 +398,8 @@ public class ExerciseServiceImpl {
         }
     }
 
-    public void create(Exercise exercise) {
-        exerciseRepository.save(exercise);
+    public Exercise create(Exercise exercise) {
+        return exerciseRepository.save(exercise);
     }
 
     public void update(Exercise newExercise, int id) {
