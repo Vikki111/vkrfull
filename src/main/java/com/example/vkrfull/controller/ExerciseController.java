@@ -1,23 +1,39 @@
 package com.example.vkrfull.controller;
 
 import com.example.vkrfull.model.Exercise;
+import com.example.vkrfull.model.FileData;
 import com.example.vkrfull.service.ExerciseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
 @CrossOrigin
 public class ExerciseController {
+
+    @Value("${upload.path}")
+    private String uploadPath;
+
+    @Autowired
+    private HttpServletRequest request;
 
     private final ExerciseServiceImpl exerciseService;
 
@@ -70,10 +86,60 @@ public class ExerciseController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping(value = "/savepdf")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<?> savePDF(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+            String filePath = request.getServletContext().getRealPath("/");
+            file.transferTo(new File(uploadPath + "/" + resultFilename));
+            System.out.println("!! "+resultFilename);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/exercises/files/{filename}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<Resource> downloadFile(@PathVariable(name = "filename")
+                                                             String filename) throws IOException {
+        Resource file = exerciseService.download(filename);
+        Path path = file.getFile()
+                .toPath();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
+    @GetMapping(value = "/exercises/files")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public List<FileData> list() {
+        return exerciseService.list();
+    }
+
     @PostMapping(value = "/exercises")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> create(@RequestBody Exercise exercise) {
+    public ResponseEntity<?> create(@RequestBody Exercise exercise,
+                                    @RequestParam("file") MultipartFile file) throws IOException {
         log.debug("exerciseBody '{}'", exercise);
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+            String filePath = request.getServletContext().getRealPath("/"); ////////// исправить путь
+            file.transferTo(new File(uploadPath + "/" + resultFilename));
+            System.out.println("!! "+resultFilename);
+            exercise.setFileName(resultFilename);
+        }
         exerciseService.create(exercise);
         log.info("new entity is created");
         return new ResponseEntity<>(HttpStatus.CREATED);

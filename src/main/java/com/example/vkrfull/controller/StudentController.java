@@ -1,5 +1,6 @@
 package com.example.vkrfull.controller;
 
+import com.example.vkrfull.model.Exercise;
 import com.example.vkrfull.model.Graph;
 import com.example.vkrfull.model.Student;
 import com.example.vkrfull.model.StudentFilterBody;
@@ -13,8 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;

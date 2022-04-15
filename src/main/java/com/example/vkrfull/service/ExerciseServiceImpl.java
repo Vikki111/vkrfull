@@ -2,19 +2,32 @@ package com.example.vkrfull.service;
 
 import com.example.vkrfull.model.Edge;
 import com.example.vkrfull.model.Exercise;
+import com.example.vkrfull.model.FileData;
 import com.example.vkrfull.model.Graph;
 import com.example.vkrfull.repository.ExerciseRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ExerciseServiceImpl {
+
+    @Value("${upload.path}")
+    private String uploadPath;
 
     private String[] vertex;    // Коллекция вершин
     private int[][] matrix;   // Матрица смежности
@@ -247,12 +260,12 @@ public class ExerciseServiceImpl {
         }
         this.pythonGraph = pythonGraph;
         this.studGraph = studGraph;
-        fillVertex(pythonGraph);
-        fillVertexStud(studGraph);
-        fillMatrix(pythonGraph);
-        fillMatrixStud(studGraph);
-        DFS();
-        DFSStud();
+//        fillVertex(pythonGraph);
+//        fillVertexStud(studGraph);
+//        fillMatrix(pythonGraph);
+//        fillMatrixStud(studGraph);
+//        DFS();
+//        DFSStud();
 //        boolean test = comparator();// не работает
         System.out.println("python graph"+ pythonGraph);
         System.out.println("stud graph " + studGraph);
@@ -289,7 +302,7 @@ public class ExerciseServiceImpl {
         List<Edge> newEdges = new ArrayList<>(studGraph.getEdges());
         for (Edge edge : studGraph.getEdges()) {
             String str = edge.getLabel();
-            if (str == null) {
+            if (str == null || str.equals("")) {
                 System.out.println("Empty label between: "+edge.getSource() + " "+ edge.getTarget());
                 return "Empty label between: "+edge.getSource() + " "+ edge.getTarget();
             }
@@ -408,6 +421,58 @@ public class ExerciseServiceImpl {
         if (exerciseRepository.existsById(id)) {
             exerciseRepository.deleteById(id);
         }
+    }
+
+    public Resource download(String filename) {
+        try {
+            Path file = Paths.get(uploadPath)
+                    .resolve(filename);
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    public List<FileData> list() {
+        try {
+            Path root = Paths.get(uploadPath);
+
+            if (Files.exists(root)) {
+                return Files.walk(root, 1)
+                        .filter(path -> !path.equals(root))
+                        .filter(path -> path.toFile()
+                                .isFile())
+                        .collect(Collectors.toList())
+                        .stream()
+                        .map(this::pathToFileData)
+                        .collect(Collectors.toList());
+            }
+            return Collections.emptyList();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not list the files!");
+        }
+    }
+
+    private FileData pathToFileData(Path path) {
+        FileData fileData = new FileData();
+        String filename = path.getFileName()
+                .toString();
+        fileData.setFilename(filename);
+
+        try {
+            fileData.setContentType(Files.probeContentType(path));
+            fileData.setSize(Files.size(path));
+        } catch (IOException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+
+        return fileData;
     }
 
 }

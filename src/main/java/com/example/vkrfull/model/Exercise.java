@@ -1,13 +1,5 @@
 package com.example.vkrfull.model;
 
-//Create table exercise
-//        (
-//        id SERIAL PRIMARY KEY,
-//        exercise varchar(5000),
-//        description varchar(5000),
-//        graph varchar(50000)
-//        );
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +20,8 @@ public class Exercise {
     private Integer id;
     @Column(name = "exercise")
     private String exercise;
+    @Column(name = "file_name")
+    private String fileName;
     @Column(name = "description")
     private String description;
     @Column(name = "graph")

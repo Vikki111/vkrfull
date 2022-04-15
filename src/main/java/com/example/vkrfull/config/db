@@ -4,6 +4,7 @@ Create table exercise
 	(
 		id SERIAL PRIMARY KEY,
 		exercise varchar(5000),
+		file_name varchar(5000),
 		description varchar(5000),
 		graph varchar(50000)
 	);
@@ -25,10 +26,14 @@ Create table student
 	);
 
 
-INSERT INTO exercise (id, exercise, description, graph) VALUES (1, 'first ex', 'first desc', 'first graph');
+INSERT INTO exercise (id, exercise, file_name, description, graph) VALUES (1, 'first ex', 'a73f48ce-68ca-4423-9279-8d6cd66f9791.Dataset.pdf', 'first desc', 'first graph');
+INSERT INTO exercise (id, exercise, file_name, description, graph) VALUES (2, 'second ex', 'a73f48ce-68ca-4423-9279-8d6cd66f9791.Dataset.pdf', 'second desc', 'second graph');
 INSERT INTO student (id, last_name, first_name, patronymic, department, mark, graph, ready, comment, exercise_id)
 VALUES (1, 'last_name', 'first_name', 'patronymic', '6221', 5, 'graph', TRUE, 'comment', 1);
 
 
 insert into roles(id, name) values(1, 'ROLE_ADMIN');
 insert into roles(id, name) values(2, 'ROLE_USER');
+
+insert into users(id, username, password, student) values(1, admin, admin, 1);
+insert into user_roles(user_id, role_id) values(1, admin, admin, 1);
