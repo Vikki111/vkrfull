@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @CrossOrigin
 @Slf4j
@@ -24,7 +26,7 @@ public class GraphController {
 
 //    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @RequestMapping(value = { "/savejson" }, method = RequestMethod.POST)
-    public String savejson(@RequestHeader(value = "student-id") int studentId,
+    public String savejson(@RequestHeader(value = "student-id") UUID studentId,
                             @RequestBody String graph) {
         System.out.println(studentId);
         Student student = studentService.get(studentId);

@@ -7,6 +7,7 @@ import com.example.vkrfull.repository.StudentRepositoryImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class StudentServiceImpl {
@@ -23,14 +24,14 @@ public class StudentServiceImpl {
         return studentRepository.save(student);
     }
 
-    public void update(Student newStudent, int id) {
+    public void update(Student newStudent, UUID id) {
         if (studentRepository.existsById(id)) {
             newStudent.setId(id);
             studentRepository.save(newStudent);
         }
     }
 
-    public Student get(int id) {
+    public Student get(UUID id) {
         return studentRepository.getById(id);
     }
 
@@ -42,7 +43,7 @@ public class StudentServiceImpl {
         return  studentRepositoryImpl.find(studentFilterBody);
     }
 
-    public void delete(int id) {
+    public void delete(UUID id) {
         if (studentRepository.existsById(id)) {
             studentRepository.deleteById(id);
         }

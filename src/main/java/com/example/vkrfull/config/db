@@ -1,8 +1,10 @@
 drop table exercise, student;
+drop table user_roles, users, roles;
 
 Create table exercise
 	(
-		id SERIAL PRIMARY KEY,
+	    id uuid PRIMARY KEY,
+		number integer,
 		exercise varchar(5000),
 		file_name varchar(5000),
 		description varchar(5000),
@@ -12,7 +14,7 @@ Create table exercise
 
 Create table student
 	(
-		id SERIAL PRIMARY KEY,
+		id uuid PRIMARY KEY,
 		last_name varchar(40),
 		first_name varchar(40),
 		patronymic varchar(40),
@@ -21,19 +23,28 @@ Create table student
 		graph varchar(50000),
 		ready boolean,
 		comment varchar(5000),
-		exercise_id integer,
+		exercise_id uuid,
 		FOREIGN KEY (exercise_id) REFERENCES exercise (id) ON DELETE RESTRICT ON UPDATE CASCADE
 	);
 
 
-INSERT INTO exercise (id, exercise, file_name, description, graph) VALUES (1, 'first ex', 'a73f48ce-68ca-4423-9279-8d6cd66f9791.Dataset.pdf', 'first desc', 'first graph');
+INSERT INTO exercise (id, exercise, file_name, description, graph) VALUES (2cc092f8-290e-442e-bf75-b1ddfd956f18, 'first ex', 'a73f48ce-68ca-4423-9279-8d6cd66f9791.Dataset.pdf', 'first desc', 'first graph');
 INSERT INTO exercise (id, exercise, file_name, description, graph) VALUES (2, 'second ex', 'a73f48ce-68ca-4423-9279-8d6cd66f9791.Dataset.pdf', 'second desc', 'second graph');
 INSERT INTO student (id, last_name, first_name, patronymic, department, mark, graph, ready, comment, exercise_id)
-VALUES (1, 'last_name', 'first_name', 'patronymic', '6221', 5, 'graph', TRUE, 'comment', 1);
+VALUES (6bc84baf-6e67-4fe1-aec3-3ebfd90662c9, 'last_name', 'first_name', 'patronymic', '6221', 5, 'graph', TRUE, 'comment', 2cc092f8-290e-442e-bf75-b1ddfd956f18);
 
 
-insert into roles(id, name) values(1, 'ROLE_ADMIN');
-insert into roles(id, name) values(2, 'ROLE_USER');
+insert into roles(id, name) values(dd93ce6d-fd14-4ba5-97c2-def4ebb87b20, 'ROLE_ADMIN');
+insert into roles(id, name) values(b76c9282-3af9-4757-ba64-652b0de964fa, 'ROLE_USER');
 
-insert into users(id, username, password, student) values(1, admin, admin, 1);
-insert into user_roles(user_id, role_id) values(1, admin, admin, 1);
+insert into users(id, username, password, student) values(b2ad0b9f-18f3-4950-b397-be656ca3604d, admin, admin, null);
+insert into user_roles(user_id, role_id) values(b2ad0b9f-18f3-4950-b397-be656ca3604d, dd93ce6d-fd14-4ba5-97c2-def4ebb87b20);
+
+2cc092f8-290e-442e-bf75-b1ddfd956f18
+6bc84baf-6e67-4fe1-aec3-3ebfd90662c9
+dd93ce6d-fd14-4ba5-97c2-def4ebb87b20
+b76c9282-3af9-4757-ba64-652b0de964fa
+b2ad0b9f-18f3-4950-b397-be656ca3604d
+c4c06ce4-0b91-4033-80ae-cf191a60d069
+8f55d256-2070-4b7d-a6a6-e974d72d98ca
+00fd7fd4-d269-4bd0-9d67-b03e15b30007

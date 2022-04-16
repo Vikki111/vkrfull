@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Objects.nonNull;
 
@@ -46,7 +47,7 @@ public class UserController {
 
     @DeleteMapping(value = "/users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> delete(@PathVariable(name = "id") UUID id) {
         User user = userRepository.findById(id).get();
         studentService.delete(user.getStudent());
         userRepository.delete(user);

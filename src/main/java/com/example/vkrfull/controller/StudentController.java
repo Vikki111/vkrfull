@@ -21,6 +21,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -71,7 +75,7 @@ public class StudentController {
 
     @GetMapping(value = "/students/graph/{id}")
 //    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    public String getGraph(@PathVariable(name = "id") int id) {
+    public String getGraph(@PathVariable(name = "id") UUID id) {
         log.info("student id '{}'", id);
         String result = studentService.get(id).getGraph();
         log.info("student graph:  {}", result);
@@ -82,6 +86,7 @@ public class StudentController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody Student student) {
         log.info("student '{}'", student);
+        student.setId(UUID.randomUUID());
         Student savedStudent = studentService.create(student);
         log.info("new student is created with id: {}", student.getId());
         return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
@@ -100,22 +105,30 @@ public class StudentController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Student>> getAll() {
         final List<Student> students = studentService.getAll();
+        final List<Exercise> exercises = exerciseService.getAll();
+        Map<UUID, Exercise> map = exercises.stream()
+                .collect(Collectors.toMap(Exercise::getId, Function.identity()));
+        for (Student student : students) {
+            student.setExerciseNumber(map.get(student.getExerciseId()).getNumber());
+        }
         log.info("get entity");
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
     @GetMapping(value = "/students/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    public ResponseEntity<Student> get(@PathVariable(name = "id") int id) {
+    public ResponseEntity<Student> get(@PathVariable(name = "id") UUID id) {
         log.debug("id '{}'", id);
         final Student student = studentService.get(id);
+        Exercise exercise = exerciseService.get(student.getExerciseId());
+        student.setExerciseNumber(exercise.getNumber());
         log.debug("student '{}'", student);
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
     @PutMapping(value = "/students/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> update(@PathVariable(name = "id") int id,
+    public ResponseEntity<?> update(@PathVariable(name = "id") UUID id,
                                     @RequestBody Student student) {
         log.debug("studentBody '{}'", student);
         studentService.update(student, id);
@@ -124,7 +137,7 @@ public class StudentController {
 
     @DeleteMapping(value = "/students/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
+    public ResponseEntity<?> delete(@PathVariable(name = "id") UUID id) {
         User user = userRepository.findByStudent(id).get();
         userRepository.delete(user);
         studentService.delete(id);

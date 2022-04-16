@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +18,6 @@ public class SignupRequest {
 
     private String password;
 
-    private Integer student;
+    private UUID student;
 
 }

@@ -20,6 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -29,9 +30,9 @@ import javax.persistence.*;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})//////////////
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private UUID id;
     @Column(name = "last_name")
     private String lastName;
     @Column(name = "first_name")
@@ -49,5 +50,8 @@ public class Student {
     @Column(name = "comment")
     private String comment;
     @Column(name = "exercise_id")
-    private Integer exerciseId;
+    private UUID exerciseId;
+
+    @Transient
+    private Integer exerciseNumber;
 }

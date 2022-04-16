@@ -20,14 +20,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ExerciseServiceImpl {
 
-    @Value("${upload.path}")
-    private String uploadPath;
+//    @Value("${upload.path}")
+//    private String uploadPath;
 
     private String[] vertex;    // Коллекция вершин
     private int[][] matrix;   // Матрица смежности
@@ -244,7 +245,7 @@ public class ExerciseServiceImpl {
         return symbols;
     }
 
-    public String validate(Graph pythonGraph, String graphJson, Integer exerciseId) {
+    public String validate(Graph pythonGraph, String graphJson, UUID exerciseId) {
         log.debug("graph '{}' and exerciseId '{}'", graphJson, exerciseId);
         ObjectMapper objectMapper = new ObjectMapper();
         Graph studGraph = new Graph();
@@ -399,17 +400,18 @@ public class ExerciseServiceImpl {
     }
 
     public Exercise create(Exercise exercise) {
+        exercise.setId(UUID.randomUUID());
         return exerciseRepository.save(exercise);
     }
 
-    public void update(Exercise newExercise, int id) {
+    public void update(Exercise newExercise, UUID id) {
         if (exerciseRepository.existsById(id)) {
             newExercise.setId(id);
             exerciseRepository.save(newExercise);
         }
     }
 
-    public Exercise get(int id) {
+    public Exercise get(UUID id) {
         return exerciseRepository.getById(id);
     }
 
@@ -417,7 +419,7 @@ public class ExerciseServiceImpl {
         return exerciseRepository.findAll();
     }
 
-    public void delete(int id) {
+    public void delete(UUID id) {
         if (exerciseRepository.existsById(id)) {
             exerciseRepository.deleteById(id);
         }
@@ -425,7 +427,9 @@ public class ExerciseServiceImpl {
 
     public Resource download(String filename) {
         try {
-            Path file = Paths.get(uploadPath)
+            Path path = Paths.get("src/files");
+            String pathString = path.toAbsolutePath().toString().replace("\\", "/");
+            Path file = Paths.get(pathString)
                     .resolve(filename);
             Resource resource = new UrlResource(file.toUri());
 
@@ -441,7 +445,7 @@ public class ExerciseServiceImpl {
 
     public List<FileData> list() {
         try {
-            Path root = Paths.get(uploadPath);
+            Path root = Paths.get("src/files");
 
             if (Files.exists(root)) {
                 return Files.walk(root, 1)

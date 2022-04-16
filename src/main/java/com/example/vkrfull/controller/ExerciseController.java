@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,8 +28,8 @@ import java.util.UUID;
 @CrossOrigin
 public class ExerciseController {
 
-    @Value("${upload.path}")
-    private String uploadPath;
+//    @Value("${upload.path}")
+//    private String uploadPath;
 
     @Autowired
     private HttpServletRequest request;
@@ -88,19 +89,19 @@ public class ExerciseController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<?> savePDF(@RequestParam("file") MultipartFile file,
                                      @RequestHeader("exerciseId") String id) throws IOException {
-        final Exercise exercise = exerciseService.get(Integer.parseInt(id));
+        final Exercise exercise = exerciseService.get(UUID.fromString(id));
         if (file != null && !file.getOriginalFilename().isEmpty()) {
-            File uploadDir = new File(uploadPath);
+            Path path = Paths.get("src/files");
+            String pathString = path.toAbsolutePath().toString().replace("\\", "/");
+            File uploadDir = new File(pathString);
             if (!uploadDir.exists()) {
                 uploadDir.mkdir();
             }
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename();
-            String filePath = request.getServletContext().getRealPath("/");//доделать
-            file.transferTo(new File(uploadPath + "/" + resultFilename));
+            String resultFilename = file.getOriginalFilename();
+            file.transferTo(new File(pathString + "/" + resultFilename));
             exercise.setFileName(resultFilename);
         }
-        exerciseService.update(exercise, Integer.parseInt(id));
+        exerciseService.update(exercise, UUID.fromString(id));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -143,17 +144,16 @@ public class ExerciseController {
 
     @GetMapping(value = "/exercises/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    public ResponseEntity<Exercise> get(@PathVariable(name = "id") int id) {
+    public ResponseEntity<Exercise> get(@PathVariable(name = "id") UUID id) {
         log.debug("id '{}'", id);
         final Exercise exercise = exerciseService.get(id);
-//        exercise.setExercise(exercise.getExercise().replaceAll("\\\\n", "&#13;&#10;"));
         log.debug("exercise '{}'", exercise);
         return new ResponseEntity<>(exercise, HttpStatus.OK);
     }
 
     @PutMapping(value = "/exercises/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> update(@PathVariable(name = "id") int id,
+    public ResponseEntity<?> update(@PathVariable(name = "id") UUID id,
                                     @RequestBody Exercise exercise) {
         log.debug("exerciseBody '{}'", exercise);
         exerciseService.update(exercise, id);
@@ -162,7 +162,7 @@ public class ExerciseController {
 
     @DeleteMapping(value = "/exercises/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
+    public ResponseEntity<?> delete(@PathVariable(name = "id") UUID id) {
         exerciseService.delete(id);
         log.debug("id '{}'", id);
         return new ResponseEntity<>(HttpStatus.OK);

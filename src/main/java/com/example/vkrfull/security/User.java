@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(	name = "users",
@@ -18,14 +19,14 @@ import java.util.Set;
 @Data
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID id;
 
     private String username;
 
     private String password;
 
-    private Integer student;
+    private UUID student;
 
     @Transient
     private String lastName;

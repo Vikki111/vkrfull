@@ -5,18 +5,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
-    private Long id;
+    private UUID id;
     private String username;
     private List<String> roles;
-    private Integer student;
+    private UUID student;
 
-    public JwtResponse(String accessToken, Long id, String username, List<String> roles, Integer student) {
+    public JwtResponse(String accessToken, UUID id, String username, List<String> roles, UUID student) {
         this.token = accessToken;
         this.id = id;
         this.username = username;
