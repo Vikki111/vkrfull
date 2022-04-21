@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -93,6 +94,7 @@ public class AuthController {
             });
         }
 
+        user.setId(UUID.randomUUID());
         user.setRoles(roles);
         user.setStudent(signUpRequest.getStudent());
         userRepository.save(user);
