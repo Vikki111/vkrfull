@@ -136,8 +136,10 @@ public class StudentController {
     @DeleteMapping(value = "/students/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable(name = "id") UUID id) {
-        User user = userRepository.findByStudent(id).get();
-        userRepository.delete(user);
+        if (userRepository.findByStudent(id).isPresent()) {
+            User user = userRepository.findByStudent(id).get();
+            userRepository.delete(user);
+        }
         studentService.delete(id);
         log.debug("id '{}'", id);
         return new ResponseEntity<>(HttpStatus.OK);
