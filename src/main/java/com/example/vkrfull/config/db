@@ -18,10 +18,9 @@ Create table student
 		last_name varchar(40),
 		first_name varchar(40),
 		patronymic varchar(40),
-		department varchar(15),
+		department varchar(20),
 		mark integer,
 		graph varchar(50000),
-		ready boolean,
 		comment varchar(5000),
 		exercise_id uuid,
 		FOREIGN KEY (exercise_id) REFERENCES exercise (id) ON DELETE RESTRICT ON UPDATE CASCADE

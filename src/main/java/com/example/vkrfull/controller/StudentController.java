@@ -42,6 +42,7 @@ public class StudentController {
         this.userRepository = userRepository;
     }
 
+    //API and response for frontend
     @PostMapping(value = "/students/validate")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<String> validate(@RequestBody Student student) {
@@ -62,8 +63,7 @@ public class StudentController {
             while ((s = stdError.readLine()) != null) {
                 System.out.println("ERROR: " +s);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("exception happened ");
             e.printStackTrace();
         }

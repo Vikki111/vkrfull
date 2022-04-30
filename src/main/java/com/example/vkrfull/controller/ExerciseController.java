@@ -5,7 +5,6 @@ import com.example.vkrfull.model.FileData;
 import com.example.vkrfull.service.ExerciseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,9 +27,6 @@ import java.util.UUID;
 @CrossOrigin
 public class ExerciseController {
 
-//    @Value("${upload.path}")
-//    private String uploadPath;
-
     @Autowired
     private HttpServletRequest request;
 
@@ -40,50 +36,6 @@ public class ExerciseController {
     public ExerciseController(ExerciseServiceImpl exerciseService) {
         this.exerciseService = exerciseService;
     }
-
-//    @GetMapping(value = "/pytest5")
-////    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<?> pytest() {
-//        try {
-//            String gr = "start = 'FOR ' var '_:=_' intnumb ' TO ' intnumb [' BY ' intnumb ] ' DO' \n"+
-//                    "var = id [ '_[_' indexes '_]_' ] \n"+
-//                    "indexes = index { '_,_' index } \n"+
-//                    "index = id | intnumb \n"+
-//                    "intnumb = '0' | ['-'] digit { digitzero } \n"+
-//                    "id = alpha { alpha | digitzero } ";
-//            String gr2 = "start = 'FOR ' var '_:=_' intnumb ' TO ' intnumb [' BY ' intnumb ] ' DO' \\nvar = id [ '_[_' indexes '_]_' ] \\nindexes = index { '_,_' index } \\nindex = id | intnumb \\nintnumb = '0' | ['-'] digit { digitzero } \\nid = alpha { alpha | digitzero } ";
-//            String gr3 = "start/=/\'FOR/\'/var/\'_:=_\'/intnumb/\'/TO/\'/intnumb/[\'/BY/\'/intnumb/]/\'/DO\'///"+
-//                    "var/=/id/[/\'_[_\'/indexes/\'_]_\'/]///"+
-//                    "indexes/=/index/{/\'_,_\'/index/}///"+
-//                    "index/=/id/|/intnumb///"+
-//                    "intnumb/=/\'0\'/|/[\'-\']/digit/{/digitzero/}///"+
-//                    "id/=/alpha/{/alpha/|/digitzero/}/";
-//            String ex = gr2;
-//            ex = ex.replaceAll(" \\\\n", "///");
-//            ex = ex.replaceAll(" ", "/");
-//            String s = null;
-//            Process p = Runtime.getRuntime().exec("python src/main/java/com/example/vkrfull/controller/maintestjava.py "+ex);
-//            BufferedReader stdInput = new BufferedReader(new
-//                    InputStreamReader(p.getInputStream()));
-//            BufferedReader stdError = new BufferedReader(new
-//                    InputStreamReader(p.getErrorStream()));
-//
-//            while ((s = stdInput.readLine()) != null) {
-//                System.out.println("RESPONSE: "+s);
-//                exerciseService.parsePythonResponse(s);
-//            }
-//            while ((s = stdError.readLine()) != null) {
-//                System.out.println("ERROR: " +s);
-//            }
-//
-//        }
-//        catch (IOException e) {
-//            System.out.println("exception happened - here's what I know: ");
-//            e.printStackTrace();
-//        }
-//
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
 
     @PostMapping(value = "/exercises/files/save")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")

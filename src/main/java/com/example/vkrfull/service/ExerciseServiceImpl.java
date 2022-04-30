@@ -300,6 +300,7 @@ public class ExerciseServiceImpl {
         // *|-|+|/
         // =|>
         // K|L|M|P
+        //space
         List<Edge> newEdges = new ArrayList<>(studGraph.getEdges());
         for (Edge edge : studGraph.getEdges()) {
             String str = edge.getLabel();
