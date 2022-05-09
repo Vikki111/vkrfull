@@ -256,7 +256,7 @@ public class ExerciseServiceImpl {
             e.printStackTrace();
         }
         String responseParseStudGraph = parseStudentGraph(studGraph);
-        if (!responseParseStudGraph.equals("true")) {
+        if (!responseParseStudGraph.equals("Верный синтаксис")) {
             return responseParseStudGraph;
         }
         this.pythonGraph = pythonGraph;
@@ -270,7 +270,7 @@ public class ExerciseServiceImpl {
 //        boolean test = comparator();// не работает
         System.out.println("python graph"+ pythonGraph);
         System.out.println("stud graph " + studGraph);
-        return "true";
+        return "Верный синтаксис";
     }
 
     public Graph parsePythonResponse(String str) {
@@ -305,8 +305,9 @@ public class ExerciseServiceImpl {
         for (Edge edge : studGraph.getEdges()) {
             String str = edge.getLabel();
             if (str == null || str.equals("")) {
-                System.out.println("Empty label between: "+edge.getSource() + " "+ edge.getTarget());
-                return "Empty label between: "+edge.getSource() + " "+ edge.getTarget();
+//                return "Empty label between: "+edge.getSource() + " "+ edge.getTarget();
+                System.out.println("Пустое наименование ребра между вершинами: "+edge.getSource() + " и "+ edge.getTarget());
+                return "Пустое наименование ребра между вершинами: "+edge.getSource() + " и "+ edge.getTarget();
             }
             if (edge.getLabel().contains("space")) {
                 newEdges.remove(edge);
@@ -337,7 +338,8 @@ public class ExerciseServiceImpl {
                 String[] strings = str.split("\\|");
                 for (String symbol : strings) {
                     if(symbol.length() > 1) {
-                        return "Incorrect label between: "+edge.getSource() + " "+ edge.getTarget();
+//                        return "Incorrect label between: "+edge.getSource() + " "+ edge.getTarget();
+                        return "Некорректное наименование ребра между вершинами: "+edge.getSource() + " и "+ edge.getTarget();
                     }
                     if (!symbol.equals("")) {
                         newEdges.add(new Edge(edge.getSource(), edge.getTarget(), symbol));
@@ -347,7 +349,8 @@ public class ExerciseServiceImpl {
         }
         studGraph.getEdges().clear();
         studGraph.getEdges().addAll(newEdges);
-        return "true";
+//        return "true";
+                return "Верный синтаксис";
     }
 
     public void alphaWithoutChar(List<Edge> newEdges, Edge edge, Character character) {

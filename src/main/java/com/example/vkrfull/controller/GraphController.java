@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-import static org.springframework.util.CollectionUtils.isEmpty;
-
 @RestController
 @CrossOrigin
 @Slf4j
@@ -50,11 +48,6 @@ public class GraphController {
                                     @PathVariable(name = "studentId")
                                             String studentId) {
         System.out.println("StudentId "+ studentId);
-//        List<String> strings = new ArrayList<>();
-//        strings.add("1");
-//        strings.add("2");
-//        strings.add("3");
-//        String result = String.join(",", strings);
 
         Student student = studentService.get(UUID.fromString(studentId));
         String ex = exerciseService.get(student.getExerciseId()).getExercise();
@@ -92,7 +85,6 @@ public class GraphController {
         for (Map.Entry entry: equal.entrySet()) {
             System.out.printf("%s %s%n", entry.getKey(), entry.getValue());
         }
-//        String result = "1,2,3";
         String result = String.join(",", equal.keySet());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -108,18 +100,13 @@ public class GraphController {
             HashMap<String, String> edgesChk = grChk.getEdges(nodeChk);
 
             // Проверяем состав символов перехода, он должен быть одинаков
-            Set<String> setStd = edgesStd.keySet();
-            Set<String> setChk = edgesChk.keySet();
             if (edgesStd.keySet().equals(edgesChk.keySet())){
                 equal.put(nodeStd, nodeChk);
                 boolean flag = true;
                 // Перебираем все ребра у текущей вершины в эталонном графе
                 for (Map.Entry entryStd : edgesStd.entrySet()) {
-                    // Проверяем есть ли ребра с такой пометкой в проверяемом графе
-                    if (edgesChk.containsKey(entryStd.getKey())){
                         // Проверяем рекурсивно на эквивалентность
                         flag = flag && checkNode(equal, checked, grStd, entryStd.getValue().toString(), grChk, edgesChk.get(entryStd.getKey()));
-                    }
                 }
                 if (!flag){
                     checked.remove(nodeStd);
