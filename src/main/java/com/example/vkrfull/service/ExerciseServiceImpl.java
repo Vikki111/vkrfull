@@ -312,14 +312,20 @@ public class ExerciseServiceImpl {
             if (edge.getLabel().contains("space")) {
                 newEdges.remove(edge);
                 newEdges.add(new Edge(edge.getSource(), edge.getTarget(), " "));
+                str = str.replace("space", "");
             }
-            if (edge.getLabel().contains("\\")) {
-                Character character = edge.getLabel().charAt(edge.getLabel().indexOf("\\")+1);
+            if (edge.getLabel().contains("A|...|Z") && edge.getLabel().contains("\\") && edge.getLabel().contains("(") && edge.getLabel().contains(")")) {
+                List<Character> characterList = new ArrayList<>();
+                for (int i = edge.getLabel().indexOf("\\"); i < edge.getLabel().indexOf(")"); i+=2) {
+                    characterList.add(edge.getLabel().charAt(i+1));
+                }
                 str = str.replaceAll("[()]", "");
                 str = str.replaceAll("A\\|...\\|Z", "");
                 str = str.replace("\\", "");
-                str = str.replace(character.toString(), "");
-                alphaWithoutChar(newEdges, edge, character);
+                for (Character character : characterList) {
+                    str = str.replace(character.toString(), "");
+                }
+                alphaWithoutChar(newEdges, edge, characterList);
             }
             if (edge.getLabel().contains("A|...|Z")) {
                 str = str.replaceAll("A\\|...\\|Z", "");
@@ -338,22 +344,25 @@ public class ExerciseServiceImpl {
                 String[] strings = str.split("\\|");
                 for (String symbol : strings) {
                     if(symbol.length() > 1) {
-//                        return "Incorrect label between: "+edge.getSource() + " "+ edge.getTarget();
                         return "Некорректное наименование ребра между вершинами: "+edge.getSource() + " и "+ edge.getTarget();
                     }
                     if (!symbol.equals("")) {
                         newEdges.add(new Edge(edge.getSource(), edge.getTarget(), symbol));
+                        str = str.replaceAll(symbol, "");
                     }
                 }
+                str = str.replaceAll("\\|", "");
+            }
+            if (str.length() > 1) {
+                return "Некорректное наименование ребра между вершинами: "+edge.getSource() + " и "+ edge.getTarget();
             }
         }
         studGraph.getEdges().clear();
         studGraph.getEdges().addAll(newEdges);
-//        return "true";
-                return "Верный синтаксис";
+        return "Верный синтаксис";
     }
 
-    public void alphaWithoutChar(List<Edge> newEdges, Edge edge, Character character) {
+    public void alphaWithoutChar(List<Edge> newEdges, Edge edge, List<Character> characterList) {
         for (Edge edge1 : newEdges) {
             if (edge1.isSame(edge)) {
                 newEdges.remove(edge1);
@@ -361,7 +370,7 @@ public class ExerciseServiceImpl {
             }
         }
         for (int i = 65; i < 91; i++) {
-            if (!character.equals((char)i)) {
+            if (!characterList.contains((char)i)) {
                 newEdges.add(new Edge(edge.getSource(), edge.getTarget(), String.valueOf((char) i)));
             }
         }
