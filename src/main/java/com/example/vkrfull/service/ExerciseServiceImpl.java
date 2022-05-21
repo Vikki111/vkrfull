@@ -27,222 +27,10 @@ import java.util.stream.Collectors;
 @Service
 public class ExerciseServiceImpl {
 
-//    @Value("${upload.path}")
-//    private String uploadPath;
-
-    private String[] vertex;    // Коллекция вершин
-    private int[][] matrix;   // Матрица смежности
-    private String[] vertexStud;    // Коллекция вершин
-    private int[][] matrixStud;   // Матрица смежности
-    private static final int INF = 999999; // Максимум
-    private static int count = 0;
-    private static int countStud = 0;
-    private Graph studGraph = new Graph();
-    private Graph pythonGraph = new Graph();
-    private List<String> sequenceStud = new ArrayList<>();
-    private List<String> sequencePython = new ArrayList<>();
-
     private final ExerciseRepository exerciseRepository;
 
     public ExerciseServiceImpl(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
-    }
-
-    /**
-     * График прохождения поиска по глубине
-     */
-    public void DFS() {
-        boolean[] visited = new boolean[vertex.length]; // Записываем метку доступа к вершине
-        // Инициализируем все вершины не посещаются
-        for(int i = 0; i < vertex.length; i++)
-            visited[i] = false;
-        System.out.println("Переход DFS:" );
-        for(int i = 0; i < vertex.length; i++) {
-            if(!visited[i])
-                DFS(i, visited);
-        }
-        System.out.println();
-    }
-
-    private void DFS(int i, boolean[] visited) {
-        count++;
-        visited[i] = true;
-        this.sequencePython.add(this.vertex[i]);
-        if(count == vertex.length) {
-            System.out.println(vertex[i]);
-        }else {
-            System.out.print(vertex[i] + "————>");
-        }
-        // Обходим все соседние вершины вершины, если она не была посещена, продолжаем
-        for(int j = firstVertex(i); j >= 0; j = nextVertex(i, j)) {
-            if(!visited[j]) {
-                DFS(j, visited);
-            }
-        }
-    }
-
-    public void DFSStud() {
-        boolean[] visited = new boolean[vertexStud.length]; // Записываем метку доступа к вершине
-        // Инициализируем все вершины не посещаются
-        for(int i = 0; i < vertexStud.length; i++)
-            visited[i] = false;
-        System.out.println("Переход DFS:" );
-        for(int i = 0; i < vertexStud.length; i++) {
-            if(!visited[i])
-                DFSStud(i, visited);
-        }
-        System.out.println();
-    }
-
-    private void DFSStud(int i, boolean[] visited) {
-        countStud++;
-        visited[i] = true;
-        this.sequenceStud.add(this.vertexStud[i]);
-        if(countStud == vertexStud.length) {
-            System.out.println(vertexStud[i]);
-        }else {
-            System.out.print(vertexStud[i] + "————>");
-        }
-        // Обходим все соседние вершины вершины, если она не была посещена, продолжаем
-        for(int j = firstVertex(i); j >= 0; j = nextVertex(i, j)) {
-            if(!visited[j]) {
-                DFSStud(j, visited);
-            }
-        }
-    }
-    
-    public boolean comparator() {
-        for (int i = 0; i < this.sequenceStud.size()-1; i++) {
-            List<String> py =findEdgeSymbols(sequencePython.get(i), sequencePython.get(i+1), this.pythonGraph);
-            List<String> stud = findEdgeSymbols(sequenceStud.get(i), sequenceStud.get(i+1), this.studGraph);
-            if (!equalCustom(py, stud)) {
-                System.out.println("Stud "+sequenceStud.get(i)+"||"+sequenceStud.get(i+1));
-                System.out.println("Py "+sequencePython.get(i)+"||"+sequencePython.get(i+1));
-                System.out.println("py "+py);
-                System.out.println("stud "+ stud);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Вернуть индекс первой смежной вершины вершины v, вернуть -1 в случае неудачи
-     */
-    private int firstVertex(int v) {
-        if(v < 0 || v > (vertex.length - 1))
-            return -1;
-        for(int i = 0; i < vertex.length; i++) {
-            if(matrix[v][i] != 0 && matrix[v][i] != INF) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    /**
-     * Возвращает индекс следующей смежной вершины вершины v относительно w или -1 в случае ошибки
-     */
-    private int nextVertex(int v, int j) {
-        if(v < 0 || v > (vertex.length - 1) || j < 0 || j > (vertex.length - 1))
-            return -1;
-        for(int i = j + 1; i < vertex.length; i++) {
-            if(matrix[v][i] != 0 && matrix[v][i] != INF)
-                return i;
-        }
-        return -1;
-    }
-
-    public void fillVertex(Graph graph) {
-        ArrayList<String> vertexList = new ArrayList<>();
-        for (Edge edge : graph.getEdges()) {
-            if(!vertexList.contains(edge.getSource())) {
-                vertexList.add(edge.getSource());
-            }
-            if(!vertexList.contains(edge.getTarget())) {
-                vertexList.add(edge.getTarget());
-            }
-        }
-        this.vertex = new String[vertexList.size()];
-        for (int i = 0; i < vertexList.size(); i++) {
-            this.vertex[i] = vertexList.get(i);
-        }
-    }
-
-    public void fillVertexStud(Graph graph) {
-        ArrayList<String> vertexList = new ArrayList<>();
-        for (Edge edge : graph.getEdges()) {
-            if(!vertexList.contains(edge.getSource())) {
-                vertexList.add(edge.getSource());
-            }
-            if(!vertexList.contains(edge.getTarget())) {
-                vertexList.add(edge.getTarget());
-            }
-        }
-        this.vertexStud = new String[vertexList.size()];
-        for (int i = 0; i < vertexList.size(); i++) {
-            this.vertexStud[i] = vertexList.get(i);
-        }
-    }
-
-    public void fillMatrix(Graph graph) {
-        //строки/столбцы
-        this.matrix = new int[this.vertex.length][this.vertex.length];
-        for (int i = 0; i < this.vertex.length; i++) { //по строкам
-            for (int j = 0; j < this.vertex.length; j++) { //по столбцам
-                if (edgeExists(this.vertex[i], this.vertex[j], graph)) {
-                    this.matrix[i][j] = 1;
-                } else {
-                    this.matrix[i][j] = 0;
-                }
-            }
-        }
-    }
-
-    public void fillMatrixStud(Graph graph) {
-        //строки/столбцы
-        this.matrixStud = new int[this.vertexStud.length][this.vertexStud.length];
-        for (int i = 0; i < this.vertexStud.length; i++) { //по строкам
-            for (int j = 0; j < this.vertexStud.length; j++) { //по столбцам
-                if (edgeExists(this.vertexStud[i], this.vertexStud[j], graph)) {
-                    this.matrixStud[i][j] = 1;
-                } else {
-                    this.matrixStud[i][j] = 0;
-                }
-            }
-        }
-    }
-
-    public boolean equalCustom(List<String> list1, List<String> list2) {
-        for (String str :list1) {
-            if(!list2.contains(str)) {
-                return false;
-            }
-        }
-        for (String str :list2) {
-            if(!list1.contains(str)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean edgeExists(String source, String target, Graph graph) {
-        for (Edge edge : graph.getEdges()) {
-            if (edge.getSource().equals(source) && edge.getTarget().equals(target)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public List<String> findEdgeSymbols(String source, String target, Graph graph) {
-        List<String> symbols = new ArrayList<>();
-        for (Edge edge : graph.getEdges()) {
-            if (edge.getSource().equals(source) && edge.getTarget().equals(target)) {
-                symbols.add(edge.getLabel());
-            }
-        }
-        return symbols;
     }
 
     public String validate(Graph pythonGraph, String graphJson, UUID exerciseId) {
@@ -259,15 +47,6 @@ public class ExerciseServiceImpl {
         if (!responseParseStudGraph.equals("Верный синтаксис")) {
             return responseParseStudGraph;
         }
-        this.pythonGraph = pythonGraph;
-        this.studGraph = studGraph;
-//        fillVertex(pythonGraph);
-//        fillVertexStud(studGraph);
-//        fillMatrix(pythonGraph);
-//        fillMatrixStud(studGraph);
-//        DFS();
-//        DFSStud();
-//        boolean test = comparator();// не работает
         System.out.println("python graph"+ pythonGraph);
         System.out.println("stud graph " + studGraph);
         return "Верный синтаксис";
@@ -305,7 +84,6 @@ public class ExerciseServiceImpl {
         for (Edge edge : studGraph.getEdges()) {
             String str = edge.getLabel();
             if (str == null || str.equals("")) {
-//                return "Empty label between: "+edge.getSource() + " "+ edge.getTarget();
                 System.out.println("Пустое наименование ребра между вершинами: "+edge.getSource() + " и "+ edge.getTarget());
                 return "Пустое наименование ребра между вершинами: "+edge.getSource() + " и "+ edge.getTarget();
             }
